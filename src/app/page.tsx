@@ -1,6 +1,28 @@
 import Image from "next/image";
+import translate from "translate";
 
-export default function Home() {
+const url = "https://wordsapiv1.p.rapidapi.com/words/?random=true";
+// const url = "https://wordsapiv1.p.rapidapi.com/words/love";
+const options = {
+  method: "GET",
+  headers: {
+    "x-rapidapi-key": "bb9c68b0e7mshd301042598c0375p15b62ejsna7c19b202206",
+    "x-rapidapi-host": "wordsapiv1.p.rapidapi.com",
+  },
+};
+
+export default async function Home() {
+  try {
+    const response = await fetch(url, options);
+    var result = await response.json();
+    console.log(result.word);
+  } catch (error) {
+    console.error(error);
+  }
+
+  const text = await translate(result.word, "se");
+  console.log(text);
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
