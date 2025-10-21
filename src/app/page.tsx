@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Stack, Text, Box, Heading, Button, Icon, For } from "@chakra-ui/react";
+import {
+  Stack,
+  Text,
+  Box,
+  Heading,
+  Button,
+  For,
+  SkeletonText,
+} from "@chakra-ui/react";
 import { RiRefreshLine } from "react-icons/ri";
 import translate from "translate";
 
@@ -63,25 +71,29 @@ export default function Home() {
       <Heading size="lg" mb={4}>
         Random Word Generator
       </Heading>
-      <Stack>
-        <Text fontSize="2xl" fontWeight="bold">
-          English: {word}
-        </Text>
-        {definitions.length === 0 ? (
-          <p>No definitions found.</p>
-        ) : (
-          <For each={definitions}>
-            {(item, index) => <div key={index}>{item.definition}...</div>}
-          </For>
-        )}
-      </Stack>
-      <Text fontSize="xl" color="teal.500">
-        Swedish: {swedish}
-      </Text>
-      <Text fontSize="xl" color="purple.500">
-        Hungarian: {hungarian}
-      </Text>
-      {loading && <Text>Loading...</Text>}
+      {loading ? (
+        <SkeletonText loading={loading} noOfLines={5} gap="4"></SkeletonText>
+      ) : (
+        <Stack>
+          <Text fontSize="2xl" fontWeight="bold">
+            English: {word}
+          </Text>
+          {definitions.length === 0 ? (
+            <p>No definitions found.</p>
+          ) : (
+            <For each={definitions}>
+              {(item, index) => <div key={index}>{item.definition}...</div>}
+            </For>
+          )}
+          <Text fontSize="xl" color="teal.500">
+            Swedish: {swedish}
+          </Text>
+          <Text fontSize="xl" color="purple.500">
+            Hungarian: {hungarian}
+          </Text>
+        </Stack>
+      )}
+
       <Button colorPalette="teal" variant="solid" onClick={fetchWord}>
         <RiRefreshLine />
       </Button>
