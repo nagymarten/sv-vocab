@@ -1,0 +1,89 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+  
+generator client {
+  provider = "prisma-client-js"
+  output   = "/app/generated/prisma-client"
+}
+
+model User {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  review    ReviewState[]
+}
+
+model Word {
+  id        String   @id @default(cuid())
+  language  String // "sv" | "en" | "hu"
+  lemma     String
+  pos       String?
+  ipa       String?
+  audioUrl  String?
+  createdAt DateTime @default(now())
+
+  // existing
+  examples Example[]
+
+  // NEW back-relations:
+  sourceMeanings WordMeaning[] @relation("Source") // WordMeaning.source -> Word
+  targetMeanings WordMeaning[] @relation("Target") // WordMeaning.target -> Word
+  reviewStates   ReviewState[] // ReviewState.word -> Word
+  deckEntries    DeckWord[] // DeckWord.word -> Word
+
+  @@unique([language, lemma])
+}
+
+model Example {
+  id          String  @id @default(cuid())
+  wordId      String
+  sentence    String
+  translation String?
+  word        Word    @relation(fields: [wordId], references: [id], onDelete: Cascade)
+}
+
+model WordMeaning {
+  id       String @id @default(cuid())
+  sourceId String
+  targetId String
+  source   Word   @relation("Source", fields: [sourceId], references: [id], onDelete: Cascade)
+  target   Word   @relation("Target", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId])
+}
+
+model ReviewState {
+  id            String   @id @default(cuid())
+  userId        String
+  wordId        String
+  easiness      Float    @default(2.5) // SM-2 E-Factor
+  interval      Int      @default(0) // days
+  repetition    Int      @default(0) // consecutive correct reps
+  due           DateTime @default(now())
+  lastGrade     Int?
+  totalAttempts Int      @default(0)
+  totalCorrect  Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word Word @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+}
+
+model Deck {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  description String?
+  words       DeckWord[]
+}
+
+model DeckWord {
+  deckId String
+  wordId String
+  deck   Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  word   Word   @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@id([deckId, wordId])
+}
