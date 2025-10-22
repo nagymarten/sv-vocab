@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { RiRefreshLine } from "react-icons/ri";
 import translate from "translate";
+import { useRouter } from "next/navigation";
 
 const url = "https://wordsapiv1.p.rapidapi.com/words/?random=true";
 const options = {
@@ -35,6 +36,7 @@ type WordResponse = {
 };
 
 export default function Random() {
+  const router = useRouter();
   const [word, setWord] = useState<string>("");
   const [definitions, setDefinitions] = useState<WordResult[]>([]);
   const [swedish, setSwedish] = useState<string>("");
@@ -96,6 +98,9 @@ export default function Random() {
 
       <Button colorPalette="teal" variant="solid" onClick={fetchWord}>
         <RiRefreshLine />
+      </Button>
+      <Button colorScheme="teal" onClick={() => router.push("/")}>
+        Go to Home Page
       </Button>
     </Box>
   );
