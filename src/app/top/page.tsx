@@ -13,7 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function Top() {
-      const router = useRouter();
+  const router = useRouter();
 
   return (
     <Stack>
